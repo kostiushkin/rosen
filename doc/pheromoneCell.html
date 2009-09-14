@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Module pheromoneCell</title>
+<link rel="stylesheet" type="text/css" href="stylesheet.css" title="EDoc">
+</head>
+<body bgcolor="white">
+<div class="navbar"><a name="#navbar_top"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<hr>
+
+<h1>Module pheromoneCell</h1>
+<ul class="index"><li><a href="#description">Description</a></li><li><a href="#index">Function Index</a></li><li><a href="#functions">Function Details</a></li></ul>Main module for handling PheromoneCell.
+
+<p><b>Behaviours:</b> <a href="gen_server.html"><tt>gen_server</tt></a>.</p>
+
+<h2><a name="description">Description</a></h2><p>Main module for handling PheromoneCell.</p>
+ 
+  <p>This module provides functions to create a cell that rapresents
+  pheromone value and manipulating it in order to change its attributes
+  like <code>to_nest</code> or <code>to_target</code> value and <code>Color</code>
+  of the relative <code>Object3d</code>.</p>
+ 
+<h2><a name="index">Function Index</a></h2>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#get_cellValue-1">get_cellValue/1</a></td><td>Get the value stored in the cell.</td></tr>
+<tr><td valign="top"><a href="#new-4">new/4</a></td><td>Creates a new Pheromone_Cell as specified in parameters.</td></tr>
+<tr><td valign="top"><a href="#set_cellValue-2">set_cellValue/2</a></td><td>Set the cell value.</td></tr>
+<tr><td valign="top"><a href="#start_link-4">start_link/4</a></td><td>Create a new cell process to handle pheromone trail.</td></tr>
+<tr><td valign="top"><a href="#updatePheromone_handler-0">updatePheromone_handler/0</a></td><td>Update pheromone Value.</td></tr>
+</table>
+
+<h2><a name="functions">Function Details</a></h2>
+
+<h3 class="function"><a name="get_cellValue-1">get_cellValue/1</a></h3>
+<div class="spec">
+<p><tt>get_cellValue(Pid) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Pid = pid()</tt></li>
+<li><tt>Result = term()</tt></li>
+</ul></p>
+</div><p>Get the value stored in the cell.
+ </p>
+
+<h3 class="function"><a name="new-4">new/4</a></h3>
+<div class="spec">
+<p><tt>new(Cell_Name::ModuleName, Obj::<a href="#type-object3d">object3d()</a>, Type, Module::Module_Strategy) -&gt; {ok, Pid}</tt></p>
+</div><p>Creates a new Pheromone_Cell as specified in parameters.
+  <br>
+       <code>{{Object,NameModule},Type,Module}</code> is parameters to be passed to the
+       <code>Module:init</code> function:<br>
+       <ul>
+       <li><code>Object</code>, is the object3d correspondent to cell,</li>
+       <li><code>NameModule</code>, is the registered name.</li><br>
+       <li><code>Type</code>, is the atom <I><code>to_nest</code></I> |
+       <I><code>to_target</code></I></li>
+       <li><code>Module</code>, is the name of the module where callbacks are implemented.</li>
+       </ul>
+  The Pheromone_Cell is handled has a new process linked with the
+  calling process. It is bound to name specified, so that, in all
+  the functions of this module, the cell can be referred with either
+  the pid or its registered name.<br>
+  <code>Module_Strategy</code> is the name of the Callback Module where the specific
+  strategy are defined. The function result is thus the pid of the
+  spawned process.
+ </p>
+
+<h3 class="function"><a name="set_cellValue-2">set_cellValue/2</a></h3>
+<div class="spec">
+<p><tt>set_cellValue(Pid, Value) -&gt; Result</tt>
+<ul class="definitions"><li><tt>Pid = term()</tt></li>
+<li><tt>Result = ok | {error, noprop}</tt></li>
+</ul></p>
+</div><p>Set the cell value.
+    	If the property esists, it is set to the new value
+       and the result is <code>ok</code>. Otherwise, the callback function
+       should return
+       	{error, noprop}
+ </p>
+
+<h3 class="function"><a name="start_link-4">start_link/4</a></h3>
+<div class="spec">
+<p><tt>start_link(Cell_Name::NameModule, Object::<a href="#type-object3d">object3d()</a>, Type, Module) -&gt; Result</tt>
+<ul class="definitions"><li><tt>NameModule = {local, Name}</tt></li>
+<li><tt>Type = to_nest | to_target</tt></li>
+<li><tt>Module = atom()</tt></li>
+<li><tt>Result = {ok, Pid} | {error, Reason} | undefined</tt></li>
+</ul></p>
+</div><p>Create a new cell process to handle pheromone trail.<br>
+       See <code>new/1</code> for details.</p>
+
+<h3 class="function"><a name="updatePheromone_handler-0">updatePheromone_handler/0</a></h3>
+<div class="spec">
+<p><tt>updatePheromone_handler() -&gt; term()</tt></p>
+</div><p>Update pheromone Value.</p>
+<hr>
+
+<div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<p><i>Generated by EDoc, Oct 19 2008, 17:24:37.</i></p>
+</body>
+</html>
