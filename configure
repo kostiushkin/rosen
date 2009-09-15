@@ -24,15 +24,28 @@ cd $ERLDIR
 cd $ERLBASE
 
 for i in `ls lib`; do
-LIBNAME=`echo $i | tr -c -d [:alpha:]`
-if [ $LIBNAME = "esdl" ]; then
-	EDSLDIR=$i
-fi
-
+	LIBNAME=`echo $i | tr -c -d [:alpha:]`
+	if [ $LIBNAME = "esdl" ]; then
+		EDSLDIR=$i
+	fi
 done
+
 if [ -z $EDSLDIR ]; then
-	echo "Install ESDL first!!!!"
-	cd $ROSECWD
+	for i in `ls addons`; do
+		LIBNAME=`echo $i | tr -c -d [:alpha:]`
+		if [ $LIBNAME = "esdl" ]; then
+			EDSLDIR=$i
+		fi
+	done
+	if [ -z $EDSLDIR ]; then
+		echo "Install ESDL first!!!!"
+		cd $ROSECWD
+	else
+		EDSLDIR=`pwd`/addons/$EDSLDIR/
+#echo $EDSLDIR
+		fix_files $EDSLDIR
+		cd $ROSEDIR
+	fi
 else
 	EDSLDIR=`pwd`/lib/$EDSLDIR/
 #echo $EDSLDIR

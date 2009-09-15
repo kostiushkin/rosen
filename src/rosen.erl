@@ -661,9 +661,8 @@ terminate (_, _, StateData) ->
 %%
 init (Config) ->
   %% Init
-  sdl:init(?SDL_INIT_VIDEO bor ?SDL_INIT_ERLDRIVER bor
-           ?SDL_INIT_NOPARACHUTE),
-  sdl_util:debug(0),
+  sdl:init(?SDL_INIT_VIDEO),
+  sdl_util:debug(1),
   Flags =
     case lists:member(fullscreen, Config) of
       true ->
@@ -745,9 +744,9 @@ valueColl(Coll) -> true.
 initWin (EngineState) ->
   W = EngineState#engine_state.screen_w,
   H = EngineState#engine_state.screen_h,
-  set_viewport (W, H,
-                EngineState#engine_state.screen_w,
-                EngineState#engine_state.screen_h),
+%%  set_viewport (W, H,
+%%                EngineState#engine_state.screen_w,
+%%                EngineState#engine_state.screen_h),
   gl:matrixMode(?GL_PROJECTION),
   gl:loadIdentity(),
   %%gl:ortho( -2.0, 2.0, -2.0, 2.0, -20.0, 20.0),
@@ -789,7 +788,6 @@ initWin (EngineState) ->
   gl:enable (?GL_BLEND),
   gl:blendFunc (?GL_SRC_ALPHA, ?GL_ONE_MINUS_SRC_ALPHA),
 
-
   %%gl:colorMaterial(?GL_FRONT, ?GL_AMBIENT_AND_DIFFUSE),
   %%gl:materialfv(?GL_FRONT, ?GL_AMBIENT_AND_DIFFUSE, {0.5, 0.5, 0.5, 1.0}),
 
@@ -803,6 +801,7 @@ initWin (EngineState) ->
 set_viewport (W, H, ScreenW, ScreenH) ->
   DW = (ScreenW - W) / 2,
   DH = (ScreenH - H) / 2,
+  io:format ("set_viewport ~p~n", [{DW, DH, W, H}]),
   gl:viewport (trunc(DW), trunc(DH), W, H).
 
 

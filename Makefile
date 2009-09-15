@@ -7,6 +7,8 @@ VSN = 0.4.1
 VERSION = $(VSN)-alpha
 APP_NAME = rosen
 
+include ./src/esdl.incl
+
 
 all:
 	@[ -d ebin ] || mkdir ebin
@@ -27,7 +29,7 @@ clean:
 	(cd src; make clean; cd ../examples; make clean; cd ..)
 
 test:
-	@erl -pa ebin -pa examples -run eurobot go
+	erl -pa ebin -pa examples -pa $(EDSLDIR)/ebin -run eurobot go
 
 dist:
 	@[ -d distibution ] || mkdir distibution
