@@ -133,7 +133,7 @@ step (ObjectPid, ObjectState, Time, DeltaTime, MotionState) ->
   NAngle = geometry:normalize_angle (Angle),
   PosTheta = geometry:normalize_angle (geometry:to_degrees (TH)),
 
-  {RealPosX, RealPosY} = world:world_from_3d (NewPos),
+  {RealPosX, RealPosY} = rosen_world:world_from_3d (NewPos),
 
 %%%%%%%%%%  io:format ("Pos. Real = ~p~n",
 %             [{RealPosX, RealPosY, NAngle}]),
@@ -201,7 +201,7 @@ get_property (_, current_position, MotionState) ->
    MotionState#diff_motion_state.pos_theta};
 %%
 get_property (Pid, current_real_position, MotionState) ->
-  {RealPosX, RealPosY} = world:world_from_3d (object3d:position (Pid)),
+  {RealPosX, RealPosY} = rosen_world:world_from_3d (object3d:position (Pid)),
   {RealPosX, RealPosY, MotionState#diff_motion_state.theta};
 %%
 get_property (_, v, MotionState) ->
@@ -236,7 +236,7 @@ set_property (_, omega, Value, MotionState) ->
 set_property (_, position, {X, Y, Theta}, MotionState) ->
   CP = object3d:position (MotionState#diff_motion_state.object_pid),
   object3d:position (MotionState#diff_motion_state.object_pid,
-                     world:world_to_3d (X, Y, CP#vector.y)),
+                     rosen_world:world_to_3d (X, Y, CP#vector.y)),
   MotionState#diff_motion_state { pos_x = X,
                                   pos_y = Y,
                                   pos_theta = Theta,

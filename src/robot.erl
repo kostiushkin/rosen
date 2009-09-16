@@ -74,7 +74,7 @@ start_link (Robot = #robot{}) ->
                              Robot#robot { object_name = ObjectName},
                              [])
   end,
-  world:add_robot (Robot#robot.world, RobotPid),
+  rosen_world:add_robot (Robot#robot.world, RobotPid),
   {ok, RobotPid}.
 
 

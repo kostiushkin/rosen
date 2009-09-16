@@ -164,7 +164,7 @@ handle_call ({get_NewPosition,RobotPid,{X,Y},Direction}, _, State) ->
 %% discrete
 
 handle_call (discrete, _, State) ->
-    {Width,Height} = world:get_dimensions(State#discretization_state.associated_world_Pid),
+    {Width,Height} = rosen_world:get_dimensions(State#discretization_state.associated_world_Pid),
     Step = State#discretization_state.step,
     {Column,Row} = {ceil(Width/Step),ceil(Height/Step)},
     NewState = State#discretization_state{dimensions = {Column,Row} },
@@ -227,12 +227,12 @@ terminate (_, _) ->
 %%====================================================================
 %
 pos_to_key({X,Y},State)-> 	Step = State#discretization_state.step,
-				{W,H} = world:get_dimensions(State#discretization_state.associated_world_Pid),
+				{W,H} = rosen_world:get_dimensions(State#discretization_state.associated_world_Pid),
 	                        {trunc((W/2 + X)/Step),trunc((H/2 + Y)/Step)}.
 %
 key_to_pos([],_)-> [];
 key_to_pos({C,R},State)-> 	Step = State#discretization_state.step,
-				{W,H} = world:get_dimensions(State#discretization_state.associated_world_Pid),
+				{W,H} = rosen_world:get_dimensions(State#discretization_state.associated_world_Pid),
 				{( C * Step - W/2 + Step/2),(R  * Step - H/2 + Step/2)}.
 %
 %% ceil(X)when (X - trunc(X))> 0.0 -> trunc(X + 1);

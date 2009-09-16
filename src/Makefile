@@ -37,7 +37,7 @@ simple_path \
 surface \
 trajectory_control \
 robot \
-world \
+rosen_world \
 contact_point \
 two_wheels_driving \
 s_curve_profile \

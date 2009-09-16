@@ -17,7 +17,7 @@
 create () ->
 
   %% the working area
-  {ok, WPid} = world:start_link (#world {name= home_plant,
+  {ok, WPid} = rosen_world:start_link (#world {name= home_plant,
 					 width = ?CM(780),
                                          height = ?CM(730),
                                          color = ?RGB(1.0, 1.0, 0.90)}),
@@ -125,8 +125,8 @@ createWalls(Walls_List,WPid),
 %
 createWalls([],_)-> ok;
 createWalls([{X0, Y0,Length, Width,Tickness,Orientation,Color}|T],WPid)->    
-    world:wall (WPid,
-		X0, Y0,
-		Length, Width, Tickness,
-		Orientation,
-		Color).
+    rosen_world:wall (WPid,
+		      X0, Y0,
+		      Length, Width, Tickness,
+		      Orientation,
+		      Color).

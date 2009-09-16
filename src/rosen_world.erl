@@ -1,5 +1,5 @@
 %
-% world.erl
+% rosen_world.erl
 %
 % ----------------------------------------------------------------------
 %
@@ -21,7 +21,7 @@
 %
 % $Id: world.erl,v 1.10 2008/08/06 13:33:10 slackydeb Exp $
 %
--module (world).
+-module (rosen_world).
 
 -include ("geometry.hrl").
 -include ("robot.hrl").

@@ -37,7 +37,7 @@
 create () ->
 
   %% the working area
-  {ok, WPid} = world:start_link (#world {name= home_plant,
+  {ok, WPid} = rosen_world:start_link (#world {name= home_plant,
 					 width = ?CM(780),
                                          height = ?CM(740),
                                          color = ?RGB(1.0, 1.0, 0.90)}),
@@ -101,12 +101,12 @@ Walls_List = [
 createWalls(Walls_List,WPid),
 
  % Nest Box
- 	world:paint_floor (WPid,
+ 	rosen_world:paint_floor (WPid,
  			   ?CM(0),-?CM(317.5),
  			   ?CM(400),?CM(110),
  			   ?RGB(1.0, 1.0, 0.0)),		     
  %Target Box
- 	world:paint_floor (WPid,
+ 	rosen_world:paint_floor (WPid,
  			   ?CM(0),?CM(0),
  			   ?CM(100),?CM(100),
  			   ?RGB(1.0, 0.50, 0.0)),	
@@ -116,7 +116,7 @@ createWalls(Walls_List,WPid),
 
 
 
-%% world:paint_floor (WPid,
+%% rosen_world:paint_floor (WPid,
 %%  			   ?CM(380),-?CM(360),
 %%  			   ?CM(20),?CM(20),
 %%  			   ?RGB(1.0, 0.50, 0.0)),
@@ -132,7 +132,7 @@ createWalls(Walls_List,WPid),
 %
 createWalls([],_)-> ok;
 createWalls([{X0, Y0,Length, Width,Tickness,Orientation,Color}|T],WPid)->    
-    world:wall (WPid,
+    rosen_world:wall (WPid,
 		X0, Y0,
 		Length, Width, Tickness,
 		Orientation,

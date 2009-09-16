@@ -48,8 +48,8 @@ model (Position, Color) ->
   Z = Position#vector.z,
   #object3d { type = cube,
               size = ?CM(1),
-              %% position = world:world_to_3d (?VECTOR (-Y, -X, Z)),
-              position = world:world_to_3d (?VECTOR (Y, -X, Z)),
+              %% position = rosen_world:world_to_3d (?VECTOR (-Y, -X, Z)),
+              position = rosen_world:world_to_3d (?VECTOR (Y, -X, Z)),
               color = Color}.
 
 %%====================================================================
@@ -68,7 +68,7 @@ step (ObjectPid, ObjectState, Time, DeltaTime, Sensor) ->
 
   {XRobot, YRobot, ThetaRobot} = robot:command (Sensor#sensor.robot,
                                                 {get_real_position}),
-  {XS, YS} = world:robot_to_world ({XRobot, YRobot},
+  {XS, YS} = rosen_world:robot_to_world ({XRobot, YRobot},
                                    ThetaRobot,
                                    {XSensor, YSensor}),
   ThetaS = geometry:normalize_angle (ThetaSensor + ThetaRobot),
@@ -77,7 +77,7 @@ step (ObjectPid, ObjectState, Time, DeltaTime, Sensor) ->
 
   SensorLine = geometry:line_for_one_point (XS, YS, ThetaS),
 
-  Walls = world:get_walls (Sensor#sensor.world),
+  Walls = rosen_world:get_walls (Sensor#sensor.world),
 
   Intersections = lists:map (fun (X) ->
                              P = geometry:line_intersect (SensorLine,
@@ -90,7 +90,7 @@ step (ObjectPid, ObjectState, Time, DeltaTime, Sensor) ->
                       ({{ok, {XI, YI}}, Wall}) ->
                       if
                         ZSensor =< Wall#wall.height ->
-                        %  case world:is_in_front ({XRobot, YRobot},
+                        %  case rosen_world:is_in_front ({XRobot, YRobot},
                          %                         ThetaRobot,
                           %                        {XI, YI}) of
 			    case point_in_semiLine (Sensor,

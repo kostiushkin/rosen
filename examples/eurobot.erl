@@ -42,37 +42,37 @@ create_robot () ->
 
 
   %% the playing area
-  {ok, WPid} = world:start_link (#world {width = ?CM(300),
+  {ok, WPid} = rosen_world:start_link (#world {width = ?CM(300),
                                          height = ?CM(210),
                                          color = ?RGB(0.25,0.25,0.25)}),
 
   %% blue starting area
-  world:paint_floor (WPid,
+  rosen_world:paint_floor (WPid,
                      ?CM(125), -?CM(80),
                      ?CM(50), ?CM(50),
                      ?RGB(0.0, 0.0, 1.0)),
 
   %% red starting area
-  world:paint_floor (WPid,
+  rosen_world:paint_floor (WPid,
                      -?CM(125), -?CM(80),
                      ?CM(50), ?CM(50),
                      ?RGB(1.0, 0.0, 0.0)),
 
   %% -----------------------------------------------------------------
 
-  world:wall (WPid,
+  rosen_world:wall (WPid,
               -?CM(75), ?CM(105),
               ?CM(150), ?CM(7.5), ?CM(1.0),
               0.0,
               ?RGB(0.0, 0.0, 1.0)),
 
-  world:wall (WPid,
+  rosen_world:wall (WPid,
               -?CM(75), -?CM(105),
               ?CM(150), ?CM(7.5), ?CM(1.0),
               0.0,
               ?RGB(0.0, 0.0, 1.0)),
 
-  world:wall (WPid,
+  rosen_world:wall (WPid,
               -?CM(150.5), 0.0,
               ?CM(210.0), ?CM(7.5), ?CM(1.0),
               90.0,
@@ -81,19 +81,19 @@ create_robot () ->
 
   %% -----------------------------------------------------------------
 
-  world:wall (WPid,
+  rosen_world:wall (WPid,
               ?CM(75), ?CM(105),
               ?CM(150), ?CM(7.5), ?CM(1.0),
               0.0,
               ?RGB(1.0, 0.0, 0.0)),
 
-  world:wall (WPid,
+  rosen_world:wall (WPid,
               ?CM(75), -?CM(105),
               ?CM(150), ?CM(7.5), ?CM(1.0),
               0.0,
               ?RGB(1.0, 0.0, 0.0)),
 
-  world:wall (WPid,
+  rosen_world:wall (WPid,
               ?CM(150.5), 0.0,
               ?CM(210.0), ?CM(7.5), ?CM(1.0),
               90.0,

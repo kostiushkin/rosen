@@ -45,8 +45,8 @@ model (Position, Color) ->
   Z = Position#vector.z,
   #object3d { type = cube,
               size = ?CM(1),
-              %% position = world:world_to_3d (?VECTOR (-Y, -X, Z)),
-              position = world:world_to_3d (?VECTOR (Y, -X, Z)),
+              %% position = rosen_world:world_to_3d (?VECTOR (-Y, -X, Z)),
+              position = rosen_world:world_to_3d (?VECTOR (Y, -X, Z)),
               color = Color}.
 
 
@@ -68,11 +68,11 @@ step (ObjectPid, ObjectState, Time, DeltaTime, Sensor) ->
 
   {XRobot, YRobot, ThetaRobot} = robot:command (Sensor#sensor.robot,
                                                 {get_real_position}),
-  {XS, YS} = world:robot_to_world ({XRobot, YRobot},
+  {XS, YS} = rosen_world:robot_to_world ({XRobot, YRobot},
                                    ThetaRobot,
                                    {XSensor, YSensor}),
   %% io:format ("contact point ~p~n", [{XS, YS}]),
-  Walls = world:get_walls (Sensor#sensor.world),
+  Walls = rosen_world:get_walls (Sensor#sensor.world),
   %%
   Value = check_wall ({XS, YS}, ZSensor, Walls),
   %%

@@ -65,31 +65,31 @@ go() ->
     %% world
     %%
     %% at the moment no walls
-    {ok, WorldPid} = world:start_link(#world { name = campo,
+    {ok, WorldPid} = rosen_world:start_link(#world { name = campo,
                                                width = ?WORLD_WIDTH,
                                                height = ?WORLD_HEIGHT,
                                                color = ?WORLD_COLOR}),
 
     %% add walls
-    world:wall (
+    rosen_world:wall (
       WorldPid,
       %% X, Y, Width, Height, Tickness, Orientation
       ?M(0), ?WORLD_HEIGHT/2, ?WORLD_WIDTH, ?WALLS_HEIGHT, ?WALLS_TICKNESS, 0,
       ?WALLS_COLOR),
 
-    world:wall (
+    rosen_world:wall (
       WorldPid,
       %% X, Y, Width, Height, Tickness, Orientation
       ?M(0), -?WORLD_HEIGHT/2, ?WORLD_WIDTH, ?WALLS_HEIGHT, ?WALLS_TICKNESS, 0,
       ?WALLS_COLOR),
 
-    world:wall (
+    rosen_world:wall (
       WorldPid,
       %% X, Y, Width, Height, Tickness, Orientation
       ?WORLD_WIDTH/2, ?M(0), ?WORLD_HEIGHT, ?WALLS_HEIGHT, ?WALLS_TICKNESS, 90,
       ?WALLS_COLOR),
 
-    world:wall (
+    rosen_world:wall (
       WorldPid,
       %% X, Y, Width, Height, Tickness, Orientation
       -?WORLD_WIDTH/2, ?M(0), ?WORLD_HEIGHT, ?WALLS_HEIGHT, ?WALLS_TICKNESS, 90,

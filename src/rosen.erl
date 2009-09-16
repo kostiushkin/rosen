@@ -648,7 +648,7 @@ terminate (_, _, StateData) ->
                  end,
                  StateData#engine_state.object_list),
   lists:foreach (fun (Pid) ->
-                     world:stop (Pid)
+                     rosen_world:stop (Pid)
                  end,
                  StateData#engine_state.world_list),
   ok.

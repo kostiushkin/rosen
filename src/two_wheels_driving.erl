@@ -86,6 +86,11 @@ handle_command ({set_speed, V, W}, Robot) ->
   gen_activity:set_property (Robot#robot.motion_pid, omega, W),
   {ok, Robot};
 %%
+handle_command ({set_lr_speed, L, R}, Robot) ->
+  gen_activity:set_property (Robot#robot.motion_pid, w_left, L),
+  gen_activity:set_property (Robot#robot.motion_pid, w_right, R),
+  {ok, Robot};
+%%
 handle_command ({set_position, X, Y, Theta}, Robot) ->
   gen_activity:set_property (Robot#robot.motion_pid,
                              position, {X, Y, Theta}),
