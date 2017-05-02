@@ -126,7 +126,7 @@ setT(_,T) ->  T+1.
 
 test () ->
   {ok, Pid} = s_curve_profile:start_link (0.5),
-  [ s_curve_profile:y (Pid, -10) || X <- lists:seq (1,15) ] ++
-    [ s_curve_profile:y (Pid, 0) || X <- lists:seq (1,15) ].
+  [ s_curve_profile:y (Pid, -10) || _X <- lists:seq (1,15) ] ++
+    [ s_curve_profile:y (Pid, 0) || _X <- lists:seq (1,15) ].
 
 

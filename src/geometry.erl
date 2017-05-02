@@ -348,8 +348,9 @@ line_for_one_point (X, Y, Orientation, SegmentWidth) ->
       K = {vertical, X},
       XA = XB = X,
       YA = Y - (SegmentWidth / 2.0),
-      YB = Y + (SegmentWidth / 2.0);
- abs (Orientation) == 180 ->
+      YB = Y + (SegmentWidth / 2.0),
+      { {XA, YA}, {XB, YB}, #line { slope = M, intercept = K } };
+    abs (Orientation) == 180 ->
       M = 0.0,
       K = Y,
   %% compute segment points
@@ -357,7 +358,8 @@ line_for_one_point (X, Y, Orientation, SegmentWidth) ->
       YA = K,
 
       XB = XA - SegmentWidth,
-      YB = K;
+      YB = K,
+     { {XA, YA}, {XB, YB}, #line { slope = M, intercept = K } };
     true ->
       M = math:tan (geometry:to_radiants (Orientation)),
       K = Y - X * M,
@@ -367,9 +369,9 @@ line_for_one_point (X, Y, Orientation, SegmentWidth) ->
       YA = XA * M + K,
 
       XB = XA + SegmentWidth * math:cos (geometry:to_radiants (Orientation)),
-      YB = XB * M + K
-  end,
-  { {XA, YA}, {XB, YB}, #line { slope = M, intercept = K } }.
+      YB = XB * M + K,
+      { {XA, YA}, {XB, YB}, #line { slope = M, intercept = K } }
+  end.
 
 
 %%====================================================================
@@ -380,16 +382,18 @@ line_for_one_point (X, Y, Orientation) ->
   if
     abs (Orientation) == 90 ->
       M = {vertical, X},
-      K = {vertical, X};
+      K = {vertical, X},
+     #line { slope = M, intercept = K };
     abs (Orientation) == 180 ->
       M = 0.0,
-      K = Y;
+      K = Y,
+     #line { slope = M, intercept = K };
     true ->
       M = math:tan (geometry:to_radiants (Orientation)),
-      K = Y - X * M
-  end,
+      K = Y - X * M,
+      #line { slope = M, intercept = K }
+  end.
 %io:format("~n~n~nOrientation ~p Radiants ~p M ~p K ~p ~n",[Orientation,geometry:to_radiants (Orientation),M,K]),
-  #line { slope = M, intercept = K }.
 
 
 %%====================================================================

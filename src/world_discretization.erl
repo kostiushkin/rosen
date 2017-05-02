@@ -38,15 +38,20 @@
 -module (world_discretization).
 -behaviour(gen_server).
 
--include ("geometry.hrl").
+%% gen_server callbacks
+-export([init/1, terminate/2]).
+-export([handle_call/3, handle_cast/2, handle_info/2]).
+-export([code_change/3]).
 
--export ([init/1, handle_call/3,start_link/3,terminate/2]).
+-export([behaviour_info/1]).
+-export([start_link/3]).
 
--export ([discrete/0,
+-export([discrete/0,
  	  get_NewPosition/3,
  	  put_Pheromone/2
 	 ]).
 
+-include ("geometry.hrl").
 
 -record (discretization_state, {associated_world_Pid = nil,
 				step = 0,
@@ -188,7 +193,7 @@ handle_call ({put_Pheromone,{X,Y},Type}, _, State) ->
 		{'EXIT', _} ->
 		    io:format("~nCellName CREATO ~p~n",[Cell_Name]),
 		    {Xo,Yo} = key_to_pos(Key,State),
-		    {ok,Pid} =  pheromoneCell:new(Cell_Name,
+		    {ok,_Pid} =  pheromoneCell:new(Cell_Name,
 						  #object3d {  
 						    type = box,
 						    width = Step,
@@ -221,7 +226,16 @@ init ({ObjectPid,Step,Module_strategy}) ->
 %% @private
 terminate (_, _) ->
   ok.
-  
+ 
+handle_cast(_Msg, State) ->
+    {noreply, State}.
+                                                                
+handle_info(_Info, State) ->
+    {noreply, State}.
+
+code_change(_OldVsn, State, _Extra) ->
+    {ok, State}.
+ 
 %%====================================================================
 %% Private Functions
 %%====================================================================
@@ -262,20 +276,20 @@ cells_Around([],_,Acc,_)-> lists:reverse(Acc);
 cells_Around([H|T],Dir,Acc,State) ->
 
     A = out_of_World(H,State#discretization_state.dimensions),
-    if 
+    Val = if 
 	A ->   			
-	    Val = undefined;
-        true ->
+	    undefined;
+    true ->
 	    Cell_Name = createName(H),
 	    case catch (pheromoneCell:get_cellValue(Cell_Name)) of
 		{'EXIT', _} ->
 		    Module = State#discretization_state.module_strategy,
 		    {Min,_}= Module:get_Pheromone_Range(),
-		    Val = {Min,Min};
+		    {Min,Min};
 		Other ->
 		   % Val = filterVal(Other,Dir)
 		   % io:format("DSA ~p OTHER ~p~n",[cVal(Other,Dir),Other]), 
-		    Val = cVal(Other,Dir)
+		    cVal(Other,Dir)
 	    end
     end,
     Tr = [{H,Val} | Acc],

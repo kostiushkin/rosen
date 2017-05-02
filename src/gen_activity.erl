@@ -52,6 +52,12 @@
 
 -include ("geometry.hrl").
 
+%% gen_server callbacks
+-export([init/1, terminate/2]).
+-export([handle_call/3, handle_cast/2, handle_info/2]).
+-export([code_change/3]).
+
+%% gen_activity
 -export ([behaviour_info/1,
           start_link/4,
           start_link/5,
@@ -62,7 +68,7 @@
           module_state/1,
           stop/1]).
 
--export ([init/1, handle_call/3, terminate/2]).
+
 
 -record (activity_state, { module,
                            module_state,
@@ -238,8 +244,8 @@ stop (Pid) ->
 %%====================================================================
 %% @private
 handle_call ({stop}, _, State) ->
-  Module = State#activity_state.module,
-  ModuleState = State#activity_state.module_state,
+  _Module = State#activity_state.module,
+  _ModuleState = State#activity_state.module_state,
   {stop, normal, ok, State};
 %%
 handle_call ({module_state}, _, State) ->
@@ -264,7 +270,7 @@ handle_call ({set_property, PropName, Value}, _, State) ->
   {reply, ok, State#activity_state { module_state = NewState }};
 
 %%
-handle_call ({step, ObjectState,{Time,Delta}= TimeParams}, _, State) ->
+handle_call ({step, ObjectState,{Time,Delta}= _TimeParams}, _, State) ->
   Module = State#activity_state.module,
   ModuleState = State#activity_state.module_state,
    
@@ -288,6 +294,8 @@ init ([Module, Params, ObjectPid, Object]) ->
                          associated_object = ObjectPid
                         }}.
 
+
+
 %%====================================================================
 %% Func: terminate/2
 %%====================================================================
@@ -298,3 +306,11 @@ terminate (Reason, State) ->
   Module:terminate (Reason, ModuleState),
   ok.
 
+handle_cast(_Msg, State) ->
+    {noreply, State}.
+                                                                
+handle_info(_Info, State) ->
+    {noreply, State}.
+
+code_change(_OldVsn, State, _Extra) ->
+    {ok, State}.

@@ -34,7 +34,7 @@
 -include ("geometry.hrl").
 -include ("robot.hrl").
 
--behaviour(gen_activity).
+%-behaviour(gen_activity).
 
 -export ([init/2,
           step/5,
@@ -63,7 +63,7 @@
 %%      This callback calculates the next state of the robot according
 %%      to the current state and actions performed.
 %%
-step (ObjectPid, ObjectState, Time,DeltaTime,
+step (_ObjectPid, _ObjectState, _Time,_DeltaTime,
       PathState = #path_state { target = false }) ->
     
     RobotPid = PathState#path_state.robotPid,
@@ -85,7 +85,7 @@ step (ObjectPid, ObjectState, Time,DeltaTime,
     {ok, NewPathState};
 
 %%
-step (ObjectPid, ObjectState, Time,DeltaTime,
+step (_ObjectPid, _ObjectState, _Time,_DeltaTime,
       PathState = #path_state { target = to_handle }) ->
 	
       Activity_Pid = PathState#path_state.robotPath_Pid,
@@ -95,7 +95,7 @@ step (ObjectPid, ObjectState, Time,DeltaTime,
         {ok, NewPathState};
 
 %%
-step (ObjectPid, ObjectState, _, _,
+step (_ObjectPid, _ObjectState, _, _,
       PathState = #path_state { target = to_control_handle }) ->
     
         RobotPid = PathState#path_state.robotPid,
@@ -107,7 +107,7 @@ step (ObjectPid, ObjectState, _, _,
     case A of
 
 	true ->	
-	    {X, Y, Theta} = robot:command (RobotPid,{get_position}),
+	    {X, Y, _Theta} = robot:command (RobotPid,{get_position}),
 	    Module = PathState#path_state.target_finder_module,
 	    NewPathState = PathState#path_state { target = Module:is_target(X,Y,
 									    PathState#path_state.direction) },
@@ -118,7 +118,7 @@ step (ObjectPid, ObjectState, _, _,
     end;
 
 %%
-step (ObjectPid, ObjectState, _, _,
+step (_ObjectPid, _ObjectState, _, _,
       PathState = #path_state { target = to_control }) ->
 
         RobotPid = PathState#path_state.robotPid,
@@ -136,7 +136,7 @@ step (ObjectPid, ObjectState, _, _,
     case A of
 
 	true ->	
-	{X, Y, Th} =  robot:command (RobotPid,{get_position}),
+	{X, Y, _Th} =  robot:command (RobotPid,{get_position}),
 	Module = PathState#path_state.target_finder_module,
 	    io:format("X ~p  Y ~p  RES ~p~n",[X,Y, Module:is_target(X,Y,
 								    PathState#path_state.direction)]),
@@ -155,7 +155,7 @@ step (ObjectPid, ObjectState, _, _,
     end;
   
 %%
-step (ObjectPid, ObjectState, _, _,
+step (_ObjectPid, _ObjectState, _, _,
       PathState = #path_state { target = true}) ->  
     
       Activity_Pid = PathState#path_state.robotPath_Pid,
@@ -183,7 +183,7 @@ init (_, Properties) ->
 %% Func: terminate/2
 %% @private
 %%====================================================================
-terminate (Reason, State) ->
+terminate (_Reason, _State) ->
   ok.
  
   

@@ -41,7 +41,11 @@
 -module (object3d).
 -behaviour(gen_server).
 
--include ("geometry.hrl").
+
+%% gen_server callbacks
+-export([init/1, terminate/2]).
+-export([handle_call/3, handle_cast/2, handle_info/2]).
+-export([code_change/3]).
 
 
 -export ([new/1,
@@ -76,7 +80,7 @@
 	  set_Visible/2,
           stop/1]).
 
--export ([init/1, handle_call/3, terminate/2]).
+-include ("geometry.hrl").
 
 -record (object3d_state, { module,
                            activities = [],
@@ -120,11 +124,11 @@ behaviour_info (_Other) ->
 %% @private
 %%====================================================================
 start_link (Module, Params = #object3d {}) ->
-  if
+  {ok, Pid} = if
     Params#object3d.name == noname ->
-      {ok, Pid} = gen_server:start_link (?MODULE, [Module, Params], []);
+        gen_server:start_link (?MODULE, [Module, Params], []);
     true ->
-      {ok, Pid} = gen_server:start_link ({local, Params#object3d.name},
+        gen_server:start_link ({local, Params#object3d.name},
                                          ?MODULE,
                                          [Module, Params], [])
   end,
@@ -373,8 +377,8 @@ start_point (Pid, St) ->
 %%
 %% @doc Gets the ending point of a line.
 %%
-end_point (Pid) ->
-  gen_server:call (Pid, {get_end_point}).
+%end_point (Pid) ->
+%  gen_server:call (Pid, {get_end_point}).
 
 
 %%====================================================================
@@ -384,8 +388,8 @@ end_point (Pid) ->
 %%
 %% @doc Gets the ending point of a line.
 %%
-end_point (Pid, End) ->
-  gen_server:call (Pid, {set_end_point, End}).
+%end_point (Pid, End) ->
+%  gen_server:call (Pid, {set_end_point, End}).
 
 
 %%====================================================================
@@ -502,13 +506,13 @@ handle_call ({add_to_compound, NewObject}, _, State) ->
 %%
 handle_call ({add_activity, Activity, ActivityName, ActivityParams}, _,
              State) ->
-  if
+  {ok, Pid} = if
     ActivityName == noname ->
-      {ok, Pid} = gen_activity:start_link (Activity,
+        gen_activity:start_link (Activity,
                                            ActivityParams, self (),
                                            State#object3d_state.module_state);
     true ->
-      {ok, Pid} = gen_activity:start_link (ActivityName, Activity,
+        gen_activity:start_link (ActivityName, Activity,
                                            ActivityParams, self (),
                                            State#object3d_state.module_state)
     end,
@@ -730,3 +734,12 @@ terminate (Reason, State) ->
                  State#object3d_state.activities),
   Module:terminate (Reason, ModuleState),
   ok.
+
+handle_cast(_Msg, State) ->
+    {noreply, State}.
+                                                                
+handle_info(_Info, State) ->
+    {noreply, State}.
+
+code_change(_OldVsn, State, _Extra) ->
+    {ok, State}.

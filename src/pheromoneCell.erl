@@ -31,10 +31,15 @@
 -module (pheromoneCell).
 -behaviour(gen_server).
 
+%% gen_server callbacks
+-export([init/1, terminate/2]).
+-export([handle_call/3, handle_cast/2, handle_info/2]).
+-export([code_change/3]).
+
 -include ("geometry.hrl").
 -include ("robot.hrl").
 
--export ([init/1, handle_call/3,handle_info/2,start_link/4,terminate/2]).
+-export([behaviour_info/1]).
 
 -export ([new/4,
 	  updatePheromone_handler/0,
@@ -65,7 +70,7 @@
 behaviour_info (callbacks) ->
   [ {init, 1},
     {updatePheromone, 1},
-    {get_Pheromone_Range/0},
+    {get_Pheromone_Range, 0},
     {terminate, 2}];
 behaviour_info (_Other) ->
   undefined.
@@ -110,7 +115,7 @@ new (Cell_Name,Object,Type,Module) ->
 %%      See <code>new/1</code> for details.
 
 start_link (Cell_Name,Object,Type,Module) ->
-  {ok, Pid_cell}= gen_server:start_link ({local,Cell_Name},?MODULE, 
+  {ok, _Pid_cell}= gen_server:start_link ({local,Cell_Name},?MODULE, 
 			 {{Object,Cell_Name},Type,Module},[]).
 
 
@@ -165,14 +170,14 @@ updatePheromone_handler() ->
 handle_call ({get_cellValue}, _, State) ->
     Value = State#pheromone_state.value,
     Range = State#pheromone_state.range,
-    Control = controlValue(Value,Range),
+    _Control = controlValue(Value,Range),
 {reply, State#pheromone_state.value, State,?DEFAULT_TIMEOUT};
 
 %% set_cellValue
 
 handle_call ({set_cellValue,{Value}}, _, State) ->
     Object3d_pid = State#pheromone_state.object3d_pid,
-    Range = State#pheromone_state.range,
+    _Range = State#pheromone_state.range,
     NewState = State#pheromone_state{value = Value},	
     object3d:set_Visible(Object3d_pid,true),
     NewColor = setColor(Value),
@@ -235,17 +240,24 @@ io:format("Processo ~p oggetto ~p~n",[Name, Pid_obj]),
 terminate (_, _) ->
   ok.
 
+handle_cast(_Msg, State) ->
+    {noreply, State}.
+                                                                
+code_change(_OldVsn, State, _Extra) ->
+    {ok, State}.
+
+
 %%====================================================================
 %% Private Functions
 %%====================================================================
 %
-controlValue([{to_nest, Vn}, {to_target,Vt}],{Min,Max})when Vn =< Min ,
+controlValue([{to_nest, Vn}, {to_target,Vt}],{Min,_Max})when Vn =< Min ,
 							    Vt =< Min -> true;
 controlValue(_,_) -> false.
 
 %
 setColor([{to_nest,V1},{to_target,V2}]) ->
-    Color = ?RGB(trunc(V2*10.0)/10.0,0.0,trunc(V1*10.0)/10.0).
+    _Color = ?RGB(trunc(V2*10.0)/10.0,0.0,trunc(V1*10.0)/10.0).
 
 %
 set_InitVal(to_nest,Min)-> Color = ?RGB(trunc(Min*20.0)/10.0,0.0,trunc(Min*10.0)/10.0),

@@ -26,7 +26,7 @@
 -include ("geometry.hrl").
 -include ("robot.hrl").
 
--behaviour (gen_activity).
+%-behaviour (gen_activity).
 
 -export ([init/2, step/5, model/2, terminate/2]).
 
@@ -59,7 +59,7 @@ step (_, _, _, _, Sensor)
   io:format ("BUMP!~n"),
   {ok, Sensor#sensor { state = Sensor#sensor.state - 1}};
 %%
-step (ObjectPid, ObjectState, Time, DeltaTime, Sensor) ->
+step (_ObjectPid, _ObjectState, _Time, _DeltaTime, Sensor) ->
   Position = Sensor#sensor.position,
 
   XSensor = Position#vector.x,

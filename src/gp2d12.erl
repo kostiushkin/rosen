@@ -27,7 +27,7 @@
 -include ("geometry.hrl").
 -include ("robot.hrl").
 
--behaviour (gen_activity).
+%-behaviour (gen_activity).
 
 -export ([init/2, step/5, model/2, get_property/3, terminate/2]).
 
@@ -58,7 +58,7 @@ model (Position, Color) ->
 %%
 %%
 
-step (ObjectPid, ObjectState, Time, DeltaTime, Sensor) ->
+step (_ObjectPid, _ObjectState, _Time, _DeltaTime, Sensor) ->
   Position = Sensor#sensor.position,
   XSensor = Position#vector.x,
   YSensor = Position#vector.y,
@@ -116,7 +116,7 @@ step (ObjectPid, ObjectState, Time, DeltaTime, Sensor) ->
   RetVal =
     if
       Distances == [] ->
-        DMin = empty,
+        _DMin = empty,
         {ok, Sensor#sensor { value = ?MAX_DIST}};
       true ->
         DMin = math:sqrt (lists:min (Distances)),
@@ -134,7 +134,7 @@ step (ObjectPid, ObjectState, Time, DeltaTime, Sensor) ->
 
 
 %
-point_in_semiLine(Sensor,{Xp,Yp},{{Xs,Ys},Orientation})-> 				 
+point_in_semiLine(_Sensor,{Xp,Yp},{{Xs,Ys},Orientation})-> 				 
     OrientationPoint = geometry:to_degrees(math:atan2(Yp-Ys,Xp-Xs)),
     abs(OrientationPoint - geometry:normalize_angle(Orientation))< ?DEGREE_ERROR.
     

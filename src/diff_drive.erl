@@ -62,7 +62,7 @@
 %%====================================================================
 %% Func: step/5
 %%====================================================================
-step (ObjectPid, ObjectState, Time, DeltaTime, MotionState) ->
+step (ObjectPid, _ObjectState, _Time, DeltaTime, MotionState) ->
   %% rotate wheels
   WL = s_curve_profile:y (MotionState#diff_motion_state.ramp_left,
                           MotionState#diff_motion_state.w_left),
@@ -133,7 +133,7 @@ step (ObjectPid, ObjectState, Time, DeltaTime, MotionState) ->
   NAngle = geometry:normalize_angle (Angle),
   PosTheta = geometry:normalize_angle (geometry:to_degrees (TH)),
 
-  {RealPosX, RealPosY} = rosen_world:world_from_3d (NewPos),
+  {_RealPosX, _RealPosY} = rosen_world:world_from_3d (NewPos),
 
 %%%%%%%%%%  io:format ("Pos. Real = ~p~n",
 %             [{RealPosX, RealPosY, NAngle}]),
@@ -186,7 +186,7 @@ rotation (P, Angle) when P == yz; P == zy ->
 
 %%
 %%
-random_error (C) -> 0.
+%random_error (C) -> 0.
 %%   X = random:uniform (C),
 %%   X rem 2.
   %%X rem trunc (C * 0.01).
@@ -275,8 +275,8 @@ set_lr (State) ->
 
 %%
 %%
-opengl_to_robot_world (V = #vector{}, Theta) ->
-  {V#vector.x, -V#vector.z, geometry:normalize_angle (Theta - 90)}.
+%opengl_to_robot_world (V = #vector{}, Theta) ->
+%  {V#vector.x, -V#vector.z, geometry:normalize_angle (Theta - 90)}.
 %%
 %%
 

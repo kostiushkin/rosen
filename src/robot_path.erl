@@ -53,7 +53,7 @@
 %%====================================================================
 %% Func: step/5
 %%====================================================================
-step (ObjectPid, ObjectState, _, _,
+step (_ObjectPid, _ObjectState, _, _,
       PathState = #path_state { current_target = nil,
                                 path_tail = [],
                                 restart = true}) ->
@@ -63,14 +63,14 @@ step (ObjectPid, ObjectState, _, _,
         }
   };
 %%
-step (ObjectPid, ObjectState, _, _,
+step (_ObjectPid, _ObjectState, _, _,
       PathState = #path_state { current_target = nil,
                                 path_tail = []}) ->
   robot:command (PathState#path_state.robot_pid,
                  {set_speed, 0.0, 0.0}),
   {ok, PathState};
 %%
-step (ObjectPid, ObjectState, _, _,
+step (_ObjectPid, _ObjectState, _, _,
       PathState = #path_state { current_target = nil }) ->
   [Current | Tail] = PathState#path_state.path_tail,
   {X, Y, Theta} = robot:command (PathState#path_state.robot_pid,
@@ -85,7 +85,7 @@ step (ObjectPid, ObjectState, _, _,
 %io:format("Position Del Robot quando current_target = nil ~p e path_tail ~p~p~n",[{X,Y},Current,Tail]),
   {ok, NewPathState};
 %%
-step (ObjectPid, ObjectState, _, _,
+step (_ObjectPid, _ObjectState, _, _,
       PathState = #path_state { current_target = {forward, X} }) ->
   SPos = PathState#path_state.robot_position,
     
@@ -110,7 +110,7 @@ step (ObjectPid, ObjectState, _, _,
       {ok, PathState}
   end;
 %%
-step (ObjectPid, ObjectState, _, _,
+step (_ObjectPid, _ObjectState, _, _,
       PathState = #path_state { current_target = {rotate, X} }) ->
   SPos = PathState#path_state.robot_orientation,
 

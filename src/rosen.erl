@@ -33,11 +33,17 @@
 -module (rosen).
 -behaviour(gen_fsm).
 
+%% gen_fsm callbacks
+-export([terminate/2]).
+-export([handle_info/3]).
+-export([handle_sync_event/4]).
+-export([code_change/4]).
+
 -include("sdl.hrl").
 -include("sdl_events.hrl").
 -include("sdl_video.hrl").
 -include("sdl_keyboard.hrl").
--include("gl.hrl").
+-include_lib("wx/include/gl.hrl").
 -include("geometry.hrl").
 
 -define (DEFAULT_PERIOD, 10).
@@ -338,7 +344,7 @@ Delta =  NewStateTime#engine_state.delta,
     no_event ->
       {next_state, idle_draw, NewStateTime, NewStateTime#engine_state.period};
     #keyboard{sym=$f} ->
-      Surface = sdl_video:getVideoSurface(),
+      _Surface = sdl_video:getVideoSurface(),
       %%io:format("~p\n", [sdl_video:wm_toggleFullScreen(Surface)]),
       {next_state, idle_draw, NewStateTime, NewStateTime#engine_state.period};
     #keyboard{sym=?SDLK_q} ->
@@ -353,17 +359,17 @@ Delta =  NewStateTime#engine_state.delta,
       {next_state, idle_draw, NewStateTime, NewStateTime#engine_state.period};
     #keyboard{} = K ->
       processKey (K, NewStateTime);
-    Event ->
+    _Event ->
       %%io:format("Got event ~p~n", [Event]),
       {next_state, idle_draw, NewStateTime, NewStateTime#engine_state.period}
   end.
 
 
 %%
-draw_object(Pid, Obj = #object3d {},false)->
+draw_object(_Pid, _Obj = #object3d {},false)->
     ok;
 %% an object of a compound object
-draw_object(Pid, Obj = #object3d {},_)
+draw_object(_Pid, Obj = #object3d {},_)
      when Obj#object3d.parent_object =/= noname ->
 %%   io:format ("NoDraw object ~p, ~p, ~p~n",
 %%              [Pid, Obj#object3d.type,
@@ -404,7 +410,7 @@ draw_object(Pid, Obj = #object3d { objects = [] },_) ->
   object3d:draw (Pid),
   ok;
 %%
-draw_object(Pid, Obj = #object3d {},_ ) -> %% compound object
+draw_object(_Pid, Obj = #object3d {},_ ) -> %% compound object
 %%   io:format ("Drawing compound object ~p, ~p, ~p~n",
 %%              [Pid, Obj#object3d.type,
 %%               Obj#object3d.name]),
@@ -413,15 +419,13 @@ draw_object(Pid, Obj = #object3d {},_ ) -> %% compound object
   DefaultAxis = Obj#object3d.default_axis,
   Angle = geometry:angle (DefaultAxis, Axis),
   RotAxis = geometry:cross (DefaultAxis, Axis),
-  if
+  {Angle2, RotAxis2} = if
     Obj#object3d.up =/= undefined ->
       Up = Obj#object3d.up,
       DefaultUp = Obj#object3d.default_up,
-      Angle2 = geometry:angle (DefaultUp, Up),
-      RotAxis2 = geometry:cross (DefaultUp, Up);
+      {geometry:angle (DefaultUp, Up), geometry:cross (DefaultUp, Up)};
     true ->
-      Angle2 = undefined,
-      RotAxis2 = undefined
+      {undefined, undefined}
   end,
   lists:foreach (fun (P) ->
                      O = object3d:obj (P),
@@ -547,22 +551,22 @@ draw_object(Pid, Obj = #object3d {},_ ) -> %% compound object
 %%
 
 
-gather_compound_objects (O) ->
-  gather_compound_objects (O, []).
+%gather_compound_objects (O) ->
+%  gather_compound_objects (O, []).
 %%
-gather_compound_objects ([], Acc) ->
-  lists:flatten (Acc);
-gather_compound_objects ([P | T], Acc) ->
-  O = object3d:obj (P),
-  if
-    O#object3d.type == compound ->
-      gather_compound_objects (T,
-                               [gather_compound_objects (O#object3d.pids)
-                                | Acc]);
-    true ->
-      gather_compound_objects (T,
-                               [{P, O} | Acc])
-  end.
+%gather_compound_objects ([], Acc) ->
+%  lists:flatten (Acc);
+%gather_compound_objects ([P | T], Acc) ->
+%  O = object3d:obj (P),
+%  if
+%    O#object3d.type == compound ->
+%      gather_compound_objects (T,
+%                               [gather_compound_objects (O#object3d.pids)
+%                                | Acc]);
+%    true ->
+%      gather_compound_objects (T,
+%                               [{P, O} | Acc])
+%  end.
 
 
 
@@ -575,7 +579,7 @@ processKey (#keyboard{sym=?SDLK_ESCAPE}, StateData) ->
       {stop, normal, StateData};
 %%
 processKey (#keyboard{sym=$f}, StateData) ->
-  Surface = sdl_video:getVideoSurface(),
+  _Surface = sdl_video:getVideoSurface(),
   %%io:format("~p\n", [sdl_video:wm_toggleFullScreen(Surface)]),
   {next_state, idle_draw, StateData, StateData#engine_state.period};
 %%
@@ -632,7 +636,7 @@ processKey (#keyboard{sym=?SDLK_SPACE}, StateData) ->
                             rotation_increment = ?VECTOR(0.0, 0.0, 0.0)},
   {next_state, idle_draw, NewStateData, NewStateData#engine_state.period};
 %%
-processKey (K, StateData) ->
+processKey (_K, StateData) ->
   %%io:format("Got event ~p~n", [K]),
   {next_state, idle_draw, StateData, StateData#engine_state.period}.
 
@@ -673,27 +677,28 @@ init (Config) ->
   sdl_video:gl_setAttribute(?SDL_GL_DOUBLEBUFFER, 1),
 
   AvailableWindowedSzs = sdl_video:listModes(null, Flags bor ?SDL_FULLSCREEN),
-  DriverName = sdl_video:videoDriverName(),
+  _DriverName = sdl_video:videoDriverName(),
 
 %%   io:format("Driver ~p ~n", [DriverName]),
 %%   io:format("Available WindowSizes ~p ~n", [AvailableWindowedSzs]),
 
-  case AvailableWindowedSzs of
-    [{_, 0,0,W,H}|_] ->
-      Res = [Test || Test <- [32,24,16,15],
-                     true == sdl_video:videoModeOK(W,H,Test,Flags)];
+  {W, H} = case AvailableWindowedSzs of
+    [{_, 0,0,W1,H1}|_] ->
+      _Res = [Test || Test <- [32,24,16,15],
+                     true == sdl_video:videoModeOK(W1,H1,Test,Flags)],
 %%       io:format("A guess at max video res is ~px~p:~p ~n", [W,H, hd(Res)]);
+        {W1, H1};
     _ ->
 %%       io:format("Can't guess max resolution~n", []),
-      W = 800, H = 600
+        {800, 600}
   end,
 
-  SR = sdl_video:setVideoMode(W, H, 16, Flags),
-  Rs= sdl_video:gl_getAttribute(?SDL_GL_RED_SIZE),
-  Gs= sdl_video:gl_getAttribute(?SDL_GL_GREEN_SIZE),
-  Bs= sdl_video:gl_getAttribute(?SDL_GL_BLUE_SIZE),
-  Ds= sdl_video:gl_getAttribute(?SDL_GL_DEPTH_SIZE),
-  Db= (1 == sdl_video:gl_getAttribute(?SDL_GL_DOUBLEBUFFER)),
+  _SR = sdl_video:setVideoMode(W, H, 16, Flags),
+  _Rs= sdl_video:gl_getAttribute(?SDL_GL_RED_SIZE),
+  _Gs= sdl_video:gl_getAttribute(?SDL_GL_GREEN_SIZE),
+  _Bs= sdl_video:gl_getAttribute(?SDL_GL_BLUE_SIZE),
+  _Ds= sdl_video:gl_getAttribute(?SDL_GL_DEPTH_SIZE),
+  %_Db= (sdl_video:gl_getAttribute(?SDL_GL_DOUBLEBUFFER) == 1),
 %%   io:format("OpenGL attributes ~n"),
 %%   io:format("Sizes in bits Red ~p Green ~p Blue ~p Depth ~p Doublebuffered ~p~n",
 %%             [Rs, Gs, Bs, Ds, Db]),
@@ -736,7 +741,7 @@ TimeType = proplists:get_value (timeType, Config),
 
 %
 valueColl(undefined) -> false;
-valueColl(Coll) -> true.
+valueColl(_Coll) -> true.
 %
 
 
@@ -843,17 +848,19 @@ time_handler(State = #engine_state {time_type = simulated}) ->   Now = State#eng
 								 NewTime = State#engine_state.time + Delta,
 %    io:format("Tempo Simulato Now  ~p Last Time ~p  Delta ~p NewTime ~p ~n",
 						%[Now,State#activity_state.last_time, Delta, NewTime]),
-								 NewState = State#engine_state{ last_time = Now,
+								 _NewState = State#engine_state{ last_time = Now,
 												delta = Delta,
 												time = NewTime
 											      };
-time_handler(State) ->  Now = now (),
+time_handler(State) ->  
+    M = erlang,
+    Now = M:now(),
 			Delta = timer:now_diff (Now, State#engine_state.last_time) / 1000000.0,
 			%% difference in seconds
 			NewTime = State#engine_state.time + Delta,
 %     io:format("Tempo Reale Now  ~p Last Time ~p  Delta ~p NewTime ~p Modulo ~p  ~n",
 	%					[Now,State#activity_state.last_time, Delta, NewTime,State#activity_state.module ]),
-			NewState = State#engine_state{time_type = real,
+			_NewState = State#engine_state{time_type = real,
 						      last_time = Now,
 						      delta = Delta,
 						      time = NewTime
@@ -861,7 +868,21 @@ time_handler(State) ->  Now = now (),
 
 %
 setInitTime(simulated)->    {0.0,0.0,0.0};
-setInitTime(_)->    now().
+setInitTime(_)->
+ M = erlang,
+ M:now().
 
 %% setDeltaTime(simulated,undefined)->    Delta;
 %% setDeltaTime(_,Delta)->    now().
+
+handle_sync_event(_, _, _, _) ->
+    ok.
+
+handle_info(_Info, State, _) ->
+    {noreply, State}.
+
+code_change(_OldVsn, State, _Extra_, _) ->
+    {ok, State}.
+
+terminate(_Reason, _State) ->
+  ok.

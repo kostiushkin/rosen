@@ -23,12 +23,17 @@
 %
 
 -module (robot).
+-behaviour (gen_server).
+
+%% gen_server callbacks
+-export([init/1, terminate/2]).
+-export([handle_call/3, handle_cast/2, handle_info/2]).
+-export([code_change/3]).
 
 -include ("geometry.hrl").
 
 -include ("robot.hrl").
 
--behaviour (gen_server).
 
 -export ([start_link/1,
           behaviour_info/1,
@@ -44,8 +49,6 @@
           get_sensors_range/2,
 	  get_object_pid/1,
           stop/1]).
-
--export ([init/1, handle_call/3,terminate/2,handle_cast/2]).
 
 
 %%====================================================================
@@ -64,13 +67,13 @@ behaviour_info (_Other) ->
 %% Func: start_link/1
 %%====================================================================
 start_link (Robot = #robot{}) ->
-  if
+  {ok, RobotPid} = if
     Robot#robot.name == noname ->
-      {ok, RobotPid} = gen_server:start_link (?MODULE, Robot, []);
+        gen_server:start_link (?MODULE, Robot, []);
     true ->
       ObjectName = list_to_atom (atom_to_list (Robot#robot.name) ++
                                  "_object"),
-      {ok, RobotPid} = gen_server:start_link ({local, Robot#robot.name}, ?MODULE,
+        gen_server:start_link ({local, Robot#robot.name}, ?MODULE,
                              Robot#robot { object_name = ObjectName},
                              [])
   end,
@@ -213,12 +216,11 @@ handle_cast (stop, State) ->
 %%
 handle_call ({command, Cmd}, _, Robot) ->
   Module = Robot#robot.type,
-  case catch (Module:handle_command (Cmd, Robot)) of
+  {Reply, NewRobot} = case catch (Module:handle_command (Cmd, Robot)) of
     {'EXIT', Reason} ->
-      Reply = {error, Reason},
-      NewRobot = Robot;
+      {{error, Reason}, Robot};
     Other ->
-      {Reply, NewRobot} = Other
+        Other
   end,
   {reply, Reply, NewRobot};
 %%
@@ -235,13 +237,13 @@ handle_call ({add_sensor, SensorName, Sensor}, _, Robot) ->
   object3d:add_to_compound (Robot#robot.object_pid, Sensor3DObjectNoMesh),
 
   Sensors = Robot#robot.sensors,
-  if
+  {ok, Pid} = if
     CompleteSensorName == undefined ->
-      {ok, Pid} = object3d:add_activity (Robot#robot.object_pid,
+      object3d:add_activity (Robot#robot.object_pid,
                                          Sensor#sensor.type,
                                          SensorNew);
     true ->
-      {ok, Pid} = object3d:add_activity (Robot#robot.object_pid,
+      object3d:add_activity (Robot#robot.object_pid,
                                          Sensor#sensor.type,
                                          CompleteSensorName,
                                          SensorNew)
@@ -291,7 +293,7 @@ handle_call ({get_sensors_range,SensorType}, _, Robot) ->
     V = lists:map (fun (Pid) ->
 			   ModuleState = gen_activity:module_state (Pid),
 			   {ModuleState#sensor.type,
-			    R = gen_activity:get_property(Pid,range)}
+			    gen_activity:get_property(Pid,range)}
 		   end,
 		   Robot#robot.sensors),
     
@@ -307,6 +309,11 @@ handle_call ({get_motion_pid}, _, Robot) ->
 handle_call ({get_object_pid}, _, Robot) ->
   {reply, Robot#robot.object_pid, Robot}.
 
+handle_info(_Info, State) ->
+    {noreply, State}.
+
+code_change(_OldVsn, State, _Extra) ->
+    {ok, State}.
 
 make_sensor_name (undefined, _) -> undefined;
 make_sensor_name (_, _Robot = #robot { name = noname } ) -> undefined;
